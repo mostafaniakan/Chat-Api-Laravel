@@ -21,6 +21,7 @@ class MessageResource extends JsonResource
             'sender' => auth()->user()->name,
             'messages' => $this->messages,
             'room_id' => $this->room_id,
+            'image'=>$this->images,
         ];
     }
 }

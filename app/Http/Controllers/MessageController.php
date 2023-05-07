@@ -8,6 +8,7 @@ use App\Http\Resources\receivedResource;
 use App\Models\Message;
 use App\Models\Room;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -22,19 +23,25 @@ class MessageController extends Controller
             $request->validate([
                 'messages' => 'required|string',
                 'room_id' => 'required',
+                'image' => 'image',
             ])
         ]);
 
         if ($validation->fails()) {
             return $this->errorResponse($validation->messages(), 400);
         }
-
+if($request->has('image')) {
+    $imagesName = Carbon::now()->microsecond . '.' . $request->image->extension();
+    $request->image->storeAs('images/posts', $imagesName, 'public');
+}
 //     create message
         $message = Message::create([
             'user_id' => $user_id,
             'room_id' => $request->room_id,
             'messages' => $request->messages,
+            'images' => $imagesName,
         ]);
+
         return new MessageResource($message);
 
     }
@@ -45,7 +52,7 @@ class MessageController extends Controller
 //        get send message
 
         $message = Message::where('room_id', $room_id)->get();
-         return MessageResource::collection($message);
+        return MessageResource::collection($message);
     }
 
 

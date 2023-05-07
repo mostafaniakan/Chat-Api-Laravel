@@ -11,7 +11,8 @@ class Message extends Model
     public $fillable=[
         'messages',
         'user_id',
-        'room_id'
+        'room_id',
+        'images'
     ];
     use HasFactory;
     public function room():BelongsTo{
