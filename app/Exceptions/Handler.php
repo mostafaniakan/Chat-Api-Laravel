@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Support\Facades\RateLimiter;
 use Symfony\Component\CssSelector\Exception\InternalErrorException;
 use Throwable;
 use App\Traits\ApiResponse;
@@ -55,6 +56,8 @@ class Handler extends ExceptionHandler
 
     public function render($request, Throwable $e)
     {
+
+
         if ($e instanceof ModelNotFoundException) {
             return $this->errorResponse($e->getMessage(), 500);
         }
@@ -62,8 +65,9 @@ class Handler extends ExceptionHandler
         if (config('app.debug')) {
             return parent::render($request, $e);
         }
-        if($e instanceof  InternalErrorException){
-            return $this->errorResponse($e->getMessage(),500);
+        if ($e instanceof InternalErrorException) {
+            return $this->errorResponse($e->getMessage(), 500);
         }
+
     }
 }

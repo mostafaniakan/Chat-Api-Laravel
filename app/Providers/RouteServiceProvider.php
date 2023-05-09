@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
@@ -35,6 +36,13 @@ class RouteServiceProvider extends ServiceProvider
 
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));
+
+//            Limit sent code
+            RateLimiter::for('downloads', function (Request $request) {
+
+                $user = User::where('phones', $request->phones)->first();
+                return Limit::perMinutes(120,1)->by($user->id);
+            });
         });
     }
 

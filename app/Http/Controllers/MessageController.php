@@ -10,6 +10,7 @@ use App\Models\Room;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class MessageController extends Controller
@@ -32,7 +33,9 @@ class MessageController extends Controller
         }
 if($request->has('image')) {
     $imagesName = Carbon::now()->microsecond . '.' . $request->image->extension();
-    $request->image->storeAs('images/posts', $imagesName, 'public');
+    Storage::disk('images')->put($imagesName,'storage');
+
+//    $request->image->storeAs( 'images/posts',$imagesName, 'public');
 }
 //     create message
         $message = Message::create([

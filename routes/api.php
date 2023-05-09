@@ -16,7 +16,8 @@ use Illuminate\Support\Facades\Route;
 
 //users
 Route::post('/Register',[\App\Http\Controllers\AuthController::class,'store']);
-Route::post('/Login',[\App\Http\Controllers\AuthController::class,'login']);
+Route::post('/Login',[\App\Http\Controllers\AuthController::class,'login'])->middleware('throttle:downloads');
+//->middleware('throttle:3600,2');
 Route::get('/Logout',[\App\Http\Controllers\AuthController::class,'logout'])->middleware('auth:sanctum');
 Route::get('/SearchUser/{id}',[\App\Http\Controllers\AuthController::class,'showUser'])->middleware('auth:sanctum');
 Route::post('/Code',[\App\Http\Controllers\AuthController::class,'codeToken']);

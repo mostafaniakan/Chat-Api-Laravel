@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 
@@ -92,8 +93,9 @@ class AuthController extends Controller
         $user = User::where('phones', $request->phones)->first();
         $sendCode = $user->codes;
 
-//        send sms
         Notification::send($user, new Sms($user, $sendCode));
+
+
     }
 
 
