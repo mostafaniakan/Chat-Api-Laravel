@@ -6,8 +6,9 @@ use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\RateLimiter;
+
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -37,12 +38,7 @@ class RouteServiceProvider extends ServiceProvider
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));
 
-//            Limit sent code
-            RateLimiter::for('downloads', function (Request $request) {
 
-                $user = User::where('phones', $request->phones)->first();
-                return Limit::perMinutes(120,1)->by($user->id);
-            });
         });
     }
 
@@ -53,8 +49,14 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function configureRateLimiting()
     {
+
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+        });
+
+//       Limit sent code
+        RateLimiter::for('LimitSent', function (Request $request) {
+            return Limit::perMinutes(2, 1)->by($request->phones);
         });
     }
 }

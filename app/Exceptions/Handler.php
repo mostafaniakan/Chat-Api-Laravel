@@ -57,7 +57,9 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $e)
     {
 
-
+        if ($e->getMessage() == "Too Many Attempts.") {
+            return $this->errorResponse($e->getMessage(), 429);
+        }
         if ($e instanceof ModelNotFoundException) {
             return $this->errorResponse($e->getMessage(), 500);
         }

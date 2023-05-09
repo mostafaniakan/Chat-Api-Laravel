@@ -12,9 +12,12 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use App\Traits\ApiResponse;
 
 class MessageController extends Controller
 {
+    use ApiResponse;
+
     public function index(Request $request)
     {
         $user_id = auth()->user()->id;
@@ -31,12 +34,12 @@ class MessageController extends Controller
         if ($validation->fails()) {
             return $this->errorResponse($validation->messages(), 400);
         }
-if($request->has('image')) {
-    $imagesName = Carbon::now()->microsecond . '.' . $request->image->extension();
-    Storage::disk('images')->put($imagesName,'storage');
+        if ($request->has('image')) {
+            $imagesName = Carbon::now()->microsecond . '.' . $request->image->extension();
+            Storage::disk('images')->put($imagesName, 'storage');
 
 //    $request->image->storeAs( 'images/posts',$imagesName, 'public');
-}
+        }
 //     create message
         $message = Message::create([
             'user_id' => $user_id,
@@ -59,16 +62,56 @@ if($request->has('image')) {
     }
 
 
-//    public function receivedMessages()
-//    {
-//
-//        $getMessage = Room::where('second_user_id', auth()->user()->id)->get('id');
-//
-//        if (!$getMessage->isEmpty()) {
-//            $receivedMessage = Message::where('room_id', '=', $getMessage[0]['id'])->get();
-//            return receivedResource::collection($receivedMessage);
-//        } else {
-//            return response()->json('empty');
-//        }
-//    }
+    public function update(Request $request)
+    {
+
+
+        $validation = Validator::make($request->all(), [
+            $request->validate([
+                'messages' => 'string',
+                'room_id' => 'required',
+                'message_id' => 'required',
+                'images' => 'image'
+            ])
+        ]);
+
+        $message = Message::where('id', $request->message_id)->first();
+
+        if ($validation->fails()) {
+            return $this->errorResponse($validation->messages(), 400);
+        }
+        if ($request->image != null) {
+            if ($request->has('image')) {
+                $imagesName = Carbon::now()->microsecond . '.' . $request->image->extension();
+                Storage::disk('images')->put($imagesName, 'storage');
+            }
+        }
+
+        Message::where('id', $request->message_id)->where('room_id', $request->room_id)->where('user_id',auth()->user()->id)->update([
+            'user_id' => $message->user_id,
+            'room_id' => $message->room_id,
+            'messages' => $request->messages ? $request->messages : $message->messages ,
+            'images' =>  $message->images,
+        ]);
+
+    }
+
+    public function delete(Request $request)
+    {
+
+        $validation = Validator::make($request->all(), [
+            $request->validate([
+                'room_id' => 'required',
+                'message_id' => 'required',
+            ])
+        ]);
+
+
+        if ($validation->fails()) {
+            return $this->errorResponse($validation->messages(), 400);
+        }
+
+        Message::where('id', $request->message_id)->where('room_id', $request->room_id)->where('user_id',auth()->user()->id)->delete();
+
+    }
 }
