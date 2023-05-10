@@ -16,7 +16,7 @@ class BotResource extends JsonResource
     {
 
         return [
-            'Code'=>$this->Code,
+            'Code'=>$this->code,
             'Currency'=>$this->Currency,
             'Sell'=>$this->Sell,
             'Buy'=>$this->Buy,

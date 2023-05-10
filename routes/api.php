@@ -37,3 +37,4 @@ Route::post('/AddUserGroup',[\App\Http\Controllers\RoomController::class,'addUse
 
 //scraper
 Route::get('/scraper/{code}',[\App\Http\Controllers\ScraperController::class,'scraper'])->middleware('auth:sanctum');
+Route::get('/ShowBotMessage',[\App\Http\Controllers\ScraperController::class,'showBotMessage'])->middleware('auth:sanctum');

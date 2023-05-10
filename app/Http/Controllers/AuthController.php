@@ -128,7 +128,6 @@ class AuthController extends Controller
 
             //        create token
             $token = $user->createToken('myApp')->plainTextToken;
-            session(['token' => $token]);
             return response()->json([
                 'user' => $user,
                 'Token' => $token
@@ -143,10 +142,8 @@ class AuthController extends Controller
 //   log out
     public function logout()
     {
-        $token = \session('token');
-
+         auth()->user()->tokens()->delete();
 //     find user login;
-        session()->forget('name');
         return response()->json('user logout');
     }
 }
