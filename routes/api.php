@@ -36,4 +36,4 @@ Route::get('/CreateRoomGroup/{name}',[\App\Http\Controllers\RoomController::clas
 Route::post('/AddUserGroup',[\App\Http\Controllers\RoomController::class,'addUser'])->middleware('auth:sanctum');
 
 //scraper
-Route::get('/scraper',[\App\Http\Controllers\ScraperController::class,'scraper']);
+Route::get('/scraper/{code}',[\App\Http\Controllers\ScraperController::class,'scraper'])->middleware('auth:sanctum');
