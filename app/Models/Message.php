@@ -8,13 +8,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Message extends Model
 {
+    use HasFactory;
     public $fillable=[
         'messages',
         'user_id',
         'room_id',
         'images'
     ];
-    use HasFactory;
+
     public function room():BelongsTo{
         return $this->belongsTo(Room::class);
     }
