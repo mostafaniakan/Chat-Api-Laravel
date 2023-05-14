@@ -86,18 +86,20 @@ class AuthController extends Controller
     public function login(Request $request)
     {
 
-        $this->checkPhoneUser($request);
+        $phone = $this->checkPhoneUser($request);
+
+        if (isset($phone->phones)) {
+            $user = User::where('phones', $request->phones)->first();
+            $sendCode = $user->codes;
+            Notification::send($user, new Sms($user, $sendCode));
+        } else {
+            return 'user not fount';
+        }
 //        if (!Hash::check($request->password, $user->password)) {
 //            return response()->json('password is incorrect', 401);
 //        }
 
 //        check phone number and get user code
-        $user = User::where('phones', $request->phones)->first();
-        $sendCode = $user->codes;
-
-
-        Notification::send($user, new Sms($user, $sendCode));
-
 
     }
 
@@ -107,43 +109,47 @@ class AuthController extends Controller
     {
 
 //        check phone number
-        $user = $this->checkPhoneUser($request);
 
+        $user = $this->checkPhoneUser($request);
+        if (isset($user->phones)) {
 //        validate input
-        $validationCode = Validator::make($request->all(), [
-            'codes' => 'required',
-        ]);
-        if ($validationCode->fails()) {
-            return response()->json($validationCode->messages(), 422);
-        }
+            $validationCode = Validator::make($request->all(), [
+                'codes' => 'required',
+            ]);
+            if ($validationCode->fails()) {
+                return response()->json($validationCode->messages(), 422);
+            }
 
 //      get info user
-        if (User::where('codes', '=', $request->codes)->first()) {
+            if (User::where('codes', '=', $request->codes)->first()) {
 
 //            update code token
-            User::where('phones', $request->phones)->update([
-                'codes' => rand(123, 10000)
-            ]);
+                User::where('phones', $request->phones)->update([
+                    'codes' => rand(123, 10000)
+                ]);
 
 
-            //        create token
-            $token = $user->createToken('myApp')->plainTextToken;
-            return response()->json([
-                'user' => $user,
-                'Token' => $token
-            ], 201);
+                //        create token
+                $token = $user->createToken('myApp')->plainTextToken;
+                return response()->json([
+                    'user' => $user,
+                    'Token' => $token
+                ], 201);
+            } else {
+                return response()->json('Incorrect code ');
+            }
         } else {
-            return response()->json('Incorrect code ');
+            return 'user not fount';
         }
-
 
     }
 
 //   log out
     public function logout()
     {
-         auth()->user()->tokens()->delete();
+        auth()->user()->tokens()->delete();
 //     find user login;
         return response()->json('user logout');
     }
+
 }

@@ -26,9 +26,11 @@ class keyTest extends TestCase
     public function keyRelationshipWithUser(){
         $key=Key::factory()->for(User::factory()->create());
         $this->assertTrue(isset($key->user->id));
+        $this->assertTrue($key->user instanceof User);
     }
     public function keyRelationshipWithRoom(){
         $key=Key::factory()->for(Room::factory()->create());
         $this->assertTrue(isset($key->room->id));
+        $this->assertTrue($key->room instanceof Room);
     }
 }

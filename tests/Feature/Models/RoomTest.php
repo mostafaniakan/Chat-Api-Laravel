@@ -32,9 +32,11 @@ class RoomTest extends TestCase
     public function roomRelationshipWithMessage(){
         $room=Room::factory()->for(Message::factory())->create();
         $this->assertTrue(isset($room->message->id));
+        $this->assertTrue($room->message instanceof Message);
     }
     public function roomRelationshipWithKey(){
         $room=Room::factory()->for(Key::factory())->create();
         $this->assertTrue(isset($room->key->id));
+        $this->assertTrue($room->key instanceof Key);
     }
 }

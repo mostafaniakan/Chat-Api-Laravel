@@ -56,7 +56,7 @@ class RouteServiceProvider extends ServiceProvider
 
 //       Limit sent code
         RateLimiter::for('LimitSent', function (Request $request) {
-            return Limit::perMinutes(2, 1)->by($request->phones);
+            return Limit::perMinutes(2, 100)->by($request->phones);
         });
     }
 }
