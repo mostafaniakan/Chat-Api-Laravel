@@ -11,13 +11,15 @@ public function successResponse($message=null,$data,$code){
         'status'=>'success',
         'message'=>$message,
         'data'=>$data,
+        'code'=>$code,
     ],$code);
 }
-public function errorResponse($message=null,$code){
+public function errorResponse($message=null,$code,){
     return response()->json([
         'status'=>'Error',
         'message'=>$message,
         'data'=>[],
+        'code'=>$code
     ],$code);
 }
 

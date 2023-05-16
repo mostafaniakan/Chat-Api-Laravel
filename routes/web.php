@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', [\App\Http\Controllers\HomeController::class,'home']);
-
-Route::post('/Register',[\App\Http\Controllers\UserController::class,'register'])->name('Register.User');
-Route::post('/Login',[\App\Http\Controllers\UserController::class,'login'])->name('LoginUser');
+Route::get('/', function () {
+    return 'home';
+});

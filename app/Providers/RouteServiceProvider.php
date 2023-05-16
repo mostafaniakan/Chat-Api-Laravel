@@ -58,5 +58,8 @@ class RouteServiceProvider extends ServiceProvider
         RateLimiter::for('LimitSent', function (Request $request) {
             return Limit::perMinutes(2, 100)->by($request->phones);
         });
+        RateLimiter::for('CheckTokens', function (Request $request) {
+            return Limit::perMinutes(60, 100)->by($request->phones);
+        });
     }
 }

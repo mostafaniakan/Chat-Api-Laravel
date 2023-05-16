@@ -128,10 +128,46 @@ body {
     width: 100vw;
     height: 100vh;
 
-
+}
+.main_code{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+.form_code{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+    width: 50%;
+}
+.form_code label {
+    width: 50%;
+    height: auto;
+}
+.form_code input{
+    margin-bottom: 10px;
+    padding-left: 10px;
+    border: solid 0.5px #dedddd;
+    width: 100%;
+    height: 35px;
+    border-radius: 5px;
+    font-size: 16px;
+}
+ .form_code .btn {
+    margin-left: 11px;
+    width: 52%;
 }
 
-
+.form_code .btn input {
+    font-size: 16px;
+    font-weight: 500;
+}
+.form_code .btn input:hover{
+    cursor: pointer;
+}
 @media (width <= 600px) {
     .container {
         flex-direction: column;

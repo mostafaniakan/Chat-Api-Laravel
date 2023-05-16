@@ -26,8 +26,8 @@ class SmsChannel
 
 //        connection panel sms
         try {
-            $pattern = $client->sendPattern("2mz94um0bab1fk2", "+983000505", "$number", ['code' => $message[0]]);
-            var_dump("Code sent");
+           // $pattern = $client->sendPattern("2mz94um0bab1fk2", "+983000505", "$number", ['code' => $message[0]]);
+           return response()->json(200);
         } catch (Error $e) {
             var_dump($e->unwrap());
             echo $e->getCode();

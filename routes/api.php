@@ -29,6 +29,7 @@ Route::get('/ReceiveSentMessages/{room_id}',[\App\Http\Controllers\MessageContro
 Route::post('/Received',[\App\Http\Controllers\MessageController::class,'receivedMessages'])->middleware('auth:sanctum');
 Route::post('/Update',[\App\Http\Controllers\MessageController::class,'update'])->middleware('auth:sanctum');
 Route::post('/Delete',[\App\Http\Controllers\MessageController::class,'delete'])->middleware('auth:sanctum');
+
 //room
 Route::get('/singleRoom/{id}',[\App\Http\Controllers\RoomController::class,'createRoomSingle'])->middleware('auth:sanctum')->name('RoomSingle');
 Route::get('/showMyRoom',[\App\Http\Controllers\RoomController::class,'showMyRoom'])->middleware('auth:sanctum');
@@ -38,3 +39,5 @@ Route::post('/AddUserGroup',[\App\Http\Controllers\RoomController::class,'addUse
 //scraper
 Route::get('/scraper/{code}',[\App\Http\Controllers\ScraperController::class,'scraper'])->middleware('auth:sanctum');
 Route::get('/ShowBotMessage',[\App\Http\Controllers\ScraperController::class,'showBotMessage'])->middleware('auth:sanctum');
+
+Route::post('/CheckCode',[\App\Http\Controllers\AuthController::class,'checkCode'])->middleware('throttle:CheckTokens');
