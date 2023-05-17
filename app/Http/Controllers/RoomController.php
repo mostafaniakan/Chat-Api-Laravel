@@ -18,33 +18,38 @@ class RoomController extends Controller
 
     public function createRoomSingle($id)
     {
+
         $userId = auth()->user()->id;
 
         $user = User::all()->where('id', $id)->first();
 
-        $keyUser = Key::where('user_id', $userId)->exists();
+        $keyUser = Key::where('user_id', $userId)->first();
 
-        if ($keyUser != true) {
-            $room = Key::where('room_id', $keyUser->room_id)->where('user_id', $user->id)->get();
-            return KeyResource::collection($room);
+        if ($user != null) {
+            if ($keyUser != null) {
+                $room = Key::where('room_id', $keyUser->room_id)->where('user_id', $user->id)->get();
+                return KeyResource::collection($room);
 
-        } else {
-            $room = Room::create([
-                'name' => '',
-                'type' => 'single',
-            ])->first();
+            } else {
 
-            Key::create([
-                'user_id' => $userId,
-                'room_id' => $room->id,]);
+                $room = Room::create([
+                    'name' => '',
+                    'type' => 'single',
+                ])->first();
 
-            Key::create([
-                'user_id' => $user->id,
-                'room_id' => $room->id,
-            ]);
-            return new RoomResource($room);
+                Key::create([
+                    'user_id' => $userId,
+                    'room_id' => $room->id,]);
+
+                Key::create([
+                    'user_id' => $user->id,
+                    'room_id' => $room->id,
+                ]);
+                return new RoomResource($room);
+            }
+        }else{
+            return $this->errorResponse('user not found',404);
         }
-
     }
 
     public function showMyRoom()
@@ -108,7 +113,7 @@ class RoomController extends Controller
             $userAddId = $request->user_id;
             $user = User::where('id', $userAddId)->first();
 
-            return $this->successResponse('user add',$user->name,200);
+            return $this->successResponse('user add', $user->name, 200);
         } else {
             return $this->errorResponse('You are not an admin or there is a user', 400);
         }

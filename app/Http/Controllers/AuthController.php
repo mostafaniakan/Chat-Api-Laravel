@@ -49,10 +49,14 @@ class AuthController extends Controller
     }
 
 //search User
-    public function showUser($id)
+    public function showUser($phones)
     {
-        $user = User::all()->where('id', $id)->first();
-        return new UserResource($user);
+        $user = User::all()->where('phones', $phones)->first();
+        if($user != null) {
+            return new UserResource($user);
+        }else{
+          return  $this->errorResponse('user not found ',404);
+        }
     }
 
 //    create user
@@ -166,8 +170,8 @@ class AuthController extends Controller
 
     public function checkCode(Request $request){
 
-        $token=User::where('remember_token',$request->token)->where('phones',$request->phones)->exists();
-        if($token == true){
+        $token=User::where('remember_token',$request->token)->where('phones',$request->phones)->first();
+        if( $token != null){
             return $this->successResponse('token exist',$token,200);
         }else{
             return  $this->errorResponse('token not exist ',404);
