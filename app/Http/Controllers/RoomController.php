@@ -9,8 +9,10 @@ use App\Models\Key;
 use App\Models\Room;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Traits\ApiResponse;
+use function MongoDB\BSON\toJSON;
 
 class RoomController extends Controller
 {
@@ -23,20 +25,30 @@ class RoomController extends Controller
 
         $user = User::all()->where('id', $id)->first();
 
-        $keyUser = Key::where('user_id', $userId)->first();
+//        $keyUser = Key::where('user_id', $user->id)->first();
+
 
         if ($user != null) {
-            if ($keyUser != null) {
-                $room = Key::where('room_id', $keyUser->room_id)->where('user_id', $user->id)->get();
-                return KeyResource::collection($room);
+
+            $roomUser = DB::table('users')->join('keys', 'users.id', '=', 'keys.user_id')
+                ->where('users.id', $userId)->pluck('keys.room_id');
+
+            $roomClient = DB::table('keys')->where('user_id', $user->id)->whereIn('keys.room_id', $roomUser)
+                ->join('rooms', 'keys.room_id', '=', 'rooms.id')
+                ->select('keys.user_id', 'keys.room_id', 'rooms.type')->get();
+
+
+            if (count($roomClient) != 0) {
+                return $this->successResponse('ok', $roomClient, 200);
 
             } else {
 
                 $room = Room::create([
-                    'name' => '',
+                    'name_room' => '',
                     'type' => 'single',
-                ])->first();
-
+                    'admin' => 0,
+                ]);
+     
                 Key::create([
                     'user_id' => $userId,
                     'room_id' => $room->id,]);
@@ -47,24 +59,37 @@ class RoomController extends Controller
                 ]);
                 return new RoomResource($room);
             }
-        }else{
-            return $this->errorResponse('user not found',404);
+        } else {
+            return $this->errorResponse('user not found', 404);
         }
     }
 
     public function showMyRoom()
     {
+        $id = auth()->user()->id;
+        $myRoom = Key::all()->where('user_id', $id)->pluck('room_id');
+        $findUser = DB::table('keys')->join('users', 'keys.user_id', '=', 'users.id',)
+            ->whereIn('keys.room_id', $myRoom)
+            ->where('keys.user_id', '!=', $id)->join('rooms', 'keys.room_id', '=', 'rooms.id')
+            ->select('users.id', 'users.name', 'keys.room_id', 'rooms.type', 'rooms.name_room')->get();
 
-        $user_id = auth()->user()->id;
 
-        $myRoom = Key::where('user_id', $user_id)->get();
-
-        return KeyResource::collection($myRoom);
+        foreach ($findUser as $type) {
+            if ($type->type == 'single') {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'room',
+                    'data' => $findUser,
+                    'code' => 200,
+                ], 200);
+            }
+        }
 
     }
 
 
-    public function createRoomGroup($name)
+    public
+    function createRoomGroup($name)
     {
 
         $user_id = auth()->user()->id;
@@ -88,7 +113,8 @@ class RoomController extends Controller
         return new RoomResource($roomGroup);
     }
 
-    public function addUser(Request $request)
+    public
+    function addUser(Request $request)
     {
         $loginId = auth()->user()->id;
         $validation = Validator::make($request->all(), [

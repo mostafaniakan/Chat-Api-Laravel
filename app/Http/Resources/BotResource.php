@@ -16,10 +16,13 @@ class BotResource extends JsonResource
     {
 
         return [
+            'id'=>$this->id,
+            'user_id'=>$this->user_id,
             'Code'=>$this->code,
             'Currency'=>$this->Currency,
             'Sell'=>$this->Sell,
             'Buy'=>$this->Buy,
+
         ];
     }
 }

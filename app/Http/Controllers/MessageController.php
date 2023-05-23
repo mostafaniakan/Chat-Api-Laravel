@@ -10,6 +10,7 @@ use App\Models\Room;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use App\Traits\ApiResponse;
@@ -39,6 +40,8 @@ class MessageController extends Controller
             Storage::disk('images')->put($imagesName, 'storage');
 
 //    $request->image->storeAs( 'images/posts',$imagesName, 'public');
+        }else{
+            $imagesName=null;
         }
 //     create message
         $message = Message::create([
@@ -55,9 +58,9 @@ class MessageController extends Controller
 
     public function getMessage($room_id)
     {
-//        get send message
 
-        $message = Message::where('room_id', $room_id)->get();
+//        get send message
+        $message=DB::table('messages')->join('users', 'messages.user_id','=','users.id')->where('room_id',$room_id)->orderBy('messages.id')->select('users.id','messages.room_id','users.name','messages.messages','messages.images',)->get();
         return MessageResource::collection($message);
     }
 
