@@ -48,7 +48,7 @@ class RoomController extends Controller
                     'type' => 'single',
                     'admin' => 0,
                 ]);
-     
+
                 Key::create([
                     'user_id' => $userId,
                     'room_id' => $room->id,]);
@@ -67,23 +67,29 @@ class RoomController extends Controller
     public function showMyRoom()
     {
         $id = auth()->user()->id;
+
         $myRoom = Key::all()->where('user_id', $id)->pluck('room_id');
-        $findUser = DB::table('keys')->join('users', 'keys.user_id', '=', 'users.id',)
+
+        $groupRoom = DB::table('keys')->join('users', 'keys.user_id', '=', 'users.id',)
+            ->whereIn('keys.room_id', $myRoom)->where('rooms.type', '=', 'group')->where('keys.user_id',$id)
+            ->join('rooms', 'keys.room_id', '=', 'rooms.id')
+            ->select('users.id', 'users.name', 'keys.room_id', 'rooms.type', 'rooms.name_room', 'rooms.admin')->get();
+
+        $singleRoom = DB::table('keys')->join('users', 'keys.user_id', '=', 'users.id',)
             ->whereIn('keys.room_id', $myRoom)
-            ->where('keys.user_id', '!=', $id)->join('rooms', 'keys.room_id', '=', 'rooms.id')
-            ->select('users.id', 'users.name', 'keys.room_id', 'rooms.type', 'rooms.name_room')->get();
+            ->where('keys.user_id', '!=', $id)->where('rooms.type', '=', 'single')
+            ->join('rooms', 'keys.room_id', '=', 'rooms.id')
+            ->select('users.id', 'users.name', 'keys.room_id', 'rooms.type', 'rooms.name_room',)->get();
 
 
-        foreach ($findUser as $type) {
-            if ($type->type == 'single') {
-                return response()->json([
-                    'status' => 'success',
-                    'message' => 'room',
-                    'data' => $findUser,
-                    'code' => 200,
-                ], 200);
-            }
-        }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'room',
+            'singleRoom' => $singleRoom,
+            'groupRoom' => $groupRoom,
+            'code' => 200,
+        ], 200);
+
 
     }
 
@@ -101,7 +107,7 @@ class RoomController extends Controller
         }
 
         $roomGroup = Room::create([
-            'name' => $name,
+            'name_room' => $name,
             'type' => 'group',
             'admin' => $user_id,
 
@@ -143,5 +149,12 @@ class RoomController extends Controller
         } else {
             return $this->errorResponse('You are not an admin or there is a user', 400);
         }
+    }
+
+    public function showUserInRoom($id)
+    {
+        $usersGroup = DB::table('keys')->join('users', 'keys.user_id', '=', 'users.id')
+            ->where('keys.room_id', $id)->select('users.name', 'users.id','keys.room_id')->get();
+        return $this->successResponse('ok', $usersGroup, 200);
     }
 }

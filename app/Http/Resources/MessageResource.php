@@ -22,6 +22,8 @@ class MessageResource extends JsonResource
             'messages' => $this->messages,
             'room_id' => $this->room_id,
             'image'=>$this->images,
+            'id_message'=>$this->id_message,
+            'code'=>200
         ];
     }
 }

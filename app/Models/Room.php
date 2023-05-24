@@ -14,7 +14,7 @@ class Room extends Model
     use HasFactory;
 
     public $fillable=[
-        'name',
+        'name_room',
         'type',
         'admin',
 

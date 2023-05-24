@@ -18,8 +18,12 @@ class RoomResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'name' => $this->name,
+            'name' => $this->name_room,
+            'admin'=>$this->admin,
+            'code'=>200,
 
         ];
     }
+
+
 }

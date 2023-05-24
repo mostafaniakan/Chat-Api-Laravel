@@ -35,7 +35,7 @@ Route::get('/SingleRoom/{id}',[\App\Http\Controllers\RoomController::class,'crea
 Route::get('/showMyRoom',[\App\Http\Controllers\RoomController::class,'showMyRoom'])->middleware('auth:sanctum');
 Route::get('/CreateRoomGroup/{name}',[\App\Http\Controllers\RoomController::class,'createRoomGroup'])->middleware('auth:sanctum');
 Route::post('/AddUserGroup',[\App\Http\Controllers\RoomController::class,'addUser'])->middleware('auth:sanctum');
-
+Route::get('/ShowUser/{room}',[\App\Http\Controllers\RoomController::class,'showUserInRoom'])->middleware('auth:sanctum');
 //scraper
 Route::get('/scraper/{code}',[\App\Http\Controllers\ScraperController::class,'scraper'])->middleware('auth:sanctum');
 Route::get('/ShowBotMessage',[\App\Http\Controllers\ScraperController::class,'showBotMessage'])->middleware('auth:sanctum');

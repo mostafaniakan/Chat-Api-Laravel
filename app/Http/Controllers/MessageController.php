@@ -40,8 +40,8 @@ class MessageController extends Controller
             Storage::disk('images')->put($imagesName, 'storage');
 
 //    $request->image->storeAs( 'images/posts',$imagesName, 'public');
-        }else{
-            $imagesName=null;
+        } else {
+            $imagesName = null;
         }
 //     create message
         $message = Message::create([
@@ -60,7 +60,13 @@ class MessageController extends Controller
     {
 
 //        get send message
-        $message=DB::table('messages')->join('users', 'messages.user_id','=','users.id')->where('room_id',$room_id)->orderBy('messages.id')->select('users.id','messages.room_id','users.name','messages.messages','messages.images',)->get();
+        $message = DB::table('messages')
+            ->join('users', 'messages.user_id', '=', 'users.id')
+            ->where('room_id', $room_id)
+            ->orderBy('messages.id')
+            ->select('users.id', 'messages.room_id', 'users.name', 'messages.messages', 'messages.images', 'messages.id AS id_message')
+            ->get();
+
         return MessageResource::collection($message);
     }
 
@@ -68,12 +74,11 @@ class MessageController extends Controller
     public function update(Request $request)
     {
 
-
         $validation = Validator::make($request->all(), [
             $request->validate([
                 'messages' => 'string',
-                'room_id' => 'required',
-                'message_id' => 'required',
+                'room_id' => 'required|integer',
+                'message_id' => 'required|integer',
                 'images' => 'image'
             ])
         ]);
@@ -83,6 +88,7 @@ class MessageController extends Controller
         if ($validation->fails()) {
             return $this->errorResponse($validation->messages(), 400);
         }
+
         if ($request->image != null) {
             if ($request->has('image')) {
                 $imagesName = Carbon::now()->microsecond . '.' . $request->image->extension();
@@ -90,12 +96,18 @@ class MessageController extends Controller
             }
         }
 
-        Message::where('id', $request->message_id)->where('room_id', $request->room_id)->where('user_id',auth()->user()->id)->update([
+        $updateMessage = Message::where('id', $request->message_id)->where('room_id', $request->room_id)->where('user_id', auth()->user()->id)->update([
             'user_id' => $message->user_id,
             'room_id' => $message->room_id,
-            'messages' => $request->messages ? $request->messages : $message->messages ,
-            'images' =>  $message->images,
+            'messages' => $request->messages ? $request->messages : $message->messages,
+            'images' => $message->images,
         ]);
+
+        if ($updateMessage !== 0) {
+            return $this->successResponse('update completed', $updateMessage, 200);
+        } else {
+            return $this->errorResponse('check input', 400);
+        }
 
     }
 
@@ -114,7 +126,11 @@ class MessageController extends Controller
             return $this->errorResponse($validation->messages(), 400);
         }
 
-        Message::where('id', $request->message_id)->where('room_id', $request->room_id)->where('user_id',auth()->user()->id)->delete();
-
+        $deleteMessage = Message::where('id', $request->message_id)->where('room_id', $request->room_id)->where('user_id', auth()->user()->id)->delete();
+        if ($deleteMessage != 0) {
+            return $this->successResponse('deleted', $deleteMessage, 200);
+        }else{
+            return $this->errorResponse('check input ',400);
+        }
     }
 }
